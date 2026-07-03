@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 namespace EmojiQuiz;
 static class Db
 {
-    static readonly Random rng=new();
+    private static readonly Random rng=new Random();
     public static void EnsureCreated()
     {
         using var ctx = new QuizContext();
@@ -21,34 +22,52 @@ static class Db
         ctx.Questions.Add(new Question { Emoji = emoji, Answer = answer, Category = category ?? "" });
         ctx.SaveChanges();
     }
+public static List<string> GetCategories()
+{
+using var ctx=new QuizContext();
+return ctx.Questions.Select(q=>q.Category)
+.Distinct()
+.OrderBy(c=>c)
+.ToList();
+} 
+
+public static bool Exists(string answer)
+{
+using var ctx = new QuizContext();
+return ctx.Questions.Any(q=>q.Answer.Trim().ToLower()==answer.Trim().ToLower());
+}
 
     public static Question? GetRandom(string category = "")
 {
     using var ctx = new QuizContext();
-    var all=ctx.Questions.ToList();
-    var q = all.AsEnumerable();
+    var q = ctx.Questions.AsEnumerable();
     if (!string.IsNullOrWhiteSpace(category))
     {
-        
-        q = q.Where(x => x.Category != null && x.Category.Trim().ToLower()==category.Trim().ToLower());
+        var c=category.Trim().ToLower();
+        q = q.Where(x => x.Category != null && x.Category.Trim().ToLower()==c);
     }
-    var list =q.ToList();
-    if (list.Count == 0) return null;
-    return list[rng.Next(list.Count)];
+    return q.AsEnumerable()
+.OrderBy(x=>rng.Next())
+.FirstOrDefault();
 }
 
     public static List<string> GetWrongAnswers(string correct, int count, string category = "")
     {
         using var ctx = new QuizContext();
-        var all=ctx.Questions.ToList();
-        var q = all.Where(x => x.Answer != correct);
-        if (!string.IsNullOrWhiteSpace(category))
+        var q=ctx.Questions.AsEnumerable();
+        if (!string.IsNullOrWhiteSpace(category)&& category !="Все")
         {
         
-            q = q.Where(x => x.Category != null && x.Category.Trim().ToLower()==category.Trim().ToLower());
+            var c =category.Trim().ToLower();
+q=q.Where(x=>x.Category!=null && x.Category.Trim().ToLower()==c);
         }
 
-        return q.OrderBy(x => Guid.NewGuid()).Select(x => x.Answer).Take(count).ToList();
+        return q.Select(x => x.Answer)
+.Distinct()
+.Where(a=>a != null && a.Trim().ToLower() != correct.Trim().ToLower())
+.OrderBy(x=>rng.Next())
+.Take(count)
+.ToList();
     }
 
     public static void SeedFromFile(string path)

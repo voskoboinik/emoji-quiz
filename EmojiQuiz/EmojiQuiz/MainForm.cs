@@ -37,7 +37,8 @@ public partial class MainForm : Form
         comboCategory.Width = 320;
         comboCategory.Left = 20;
         comboCategory.DropDownStyle = ComboBoxStyle.DropDownList;
-        comboCategory.Items.AddRange(new[] { "Все", "Фильм", "Мультфильм", "Сериал" });
+comboCategory.Items.Add("Все");
+        comboCategory.Items.AddRange(Db.GetCategories().ToArray());
         comboCategory.SelectedIndex = 0;
         Controls.Add(comboCategory);
 

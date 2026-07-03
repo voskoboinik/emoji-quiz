@@ -117,6 +117,7 @@ public partial class GameForm : Form
         labelTimer.Text = "⏱ 15";
         labelTimer.ForeColor = Color.Yellow;
         timer.Start();
+        SetAnswerEnabled(true);
 
         var options = Db.GetWrongAnswers(current.Answer, 3, category);
         options.Add(current.Answer);
@@ -129,11 +130,14 @@ public partial class GameForm : Form
             else { buttons[i].Visible = false; }
         }
     }
+    void SetAnswerEnabled(bool on)
+        =>button1.Enabled=button2.Enabled=button3.Enabled=button4.Enabled=on;
 
     void CheckAnswer(string chosen)
     {
-        if (current == null) return;
+        if (current == null || !button1.Enabled) return;
         timer.Stop();
+        SetAnswerEnabled(false);
         if (chosen == current.Answer)
         {
             score++;
