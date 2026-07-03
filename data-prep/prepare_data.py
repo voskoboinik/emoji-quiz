@@ -30,7 +30,8 @@ print("Русских названий нашли:", len(ru))
 
 result = merged.merge(ru, on="tconst", how="inner")
 
-final = result[["tconst", "title_ru", "emoji"]].dropna()
+result["category"]="Фильмы"
+final = result[["tconst", "title_ru", "emoji","category"]].dropna()
 final.to_csv("movies_ru_emoji.tsv", sep="\t", index=False, encoding="utf-8")
 
 print("ИТОГО строк в результате:", len(final))
