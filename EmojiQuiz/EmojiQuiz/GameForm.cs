@@ -98,6 +98,8 @@ public partial class GameForm : Form
         if (secondsLeft <= 0)
         {
             timer.Stop();
+SetAnswerEnabled(false);
+
             labelResult.Text = "Время вышло! Это " + current?.Answer;
             labelResult.ForeColor = Color.OrangeRed;
             questionNumber++;

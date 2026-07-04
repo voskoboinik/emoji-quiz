@@ -32,7 +32,6 @@ public partial class MainForm : Form
         Controls.Add(labelCat);
 
         var comboCategory = new ComboBox();
-        comboCategory.Left = 40;
         comboCategory.Top = 100;
         comboCategory.Width = 320;
         comboCategory.Left = 20;
